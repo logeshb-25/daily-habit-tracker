@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Goals & Habits Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="goal-title" id="main-goal">Daily Habit Tracker</h1>
+                <button class="btn-edit-goal" id="edit-goal-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+            <div class="header-right">
+                <div class="monthly-progress">
+                    <span class="progress-label">Monthly Progress</span>
+                    <div class="progress-value" id="monthly-percentage">0%</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Habits Section -->
+            <section class="habits-section">
+                <div class="section-header">
+                    <h2>Daily Habits</h2>
+                    <button class="btn-add" id="add-habit-btn">
+                        <i class="fas fa-plus"></i> Add Habit
+                    </button>
+                </div>
+                
+                <div class="habits-container" id="habits-container">
+                    <!-- Habit cards will be dynamically added here -->
+                    <div class="empty-state" id="empty-state">
+                        <i class="fas fa-clipboard-list empty-icon"></i>
+                        <h3>No habits yet</h3>
+                        <p>Click "Add Habit" to create your first daily habit</p>
+                    </div>
+                </div>
+                
+                <!-- Current Streak Display -->
+                <div class="streak-container">
+                    <div class="streak-card">
+                        <div class="streak-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="streak-info">
+                            <h3>Current Streak</h3>
+                            <p class="streak-count" id="current-streak">0 days</p>
+                            <p class="streak-desc">Keep going! You're doing great.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section class="analytics-section">
+                <h2>Progress Analytics</h2>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Daily Completion Trend</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="daily-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Weekly Summary</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="weekly-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="monthly-summary">
+                    <h3>Monthly Summary</h3>
+                    <div class="summary-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="habits-completed">0</div>
+                            <div class="stat-label">Habits Completed Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-habits">0</div>
+                            <div class="stat-label">Total Habits</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="best-streak">0</div>
+                            <div class="stat-label">Best Streak</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Daily Goals & Habits Tracker • Reset automatically every month • Keep building good habits!</p>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-overlay"></div>
+    
+    <!-- Add/Edit Habit Modal -->
+    <div class="modal" id="habit-modal">
+        <div class="modal-header">
+            <h3 id="modal-title">Add New Habit</h3>
+            <button class="btn-close" id="close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="habit-form">
+                <div class="form-group">
+                    <label for="habit-name">Habit Name</label>
+                    <input type="text" id="habit-name" placeholder="e.g., Drink 8 glasses of water" required>
+                </div>
+                <div class="form-group">
+                    <label for="habit-category">Category</label>
+                    <select id="habit-category">
+                        <option value="health">Health & Fitness</option>
+                        <option value="work">Work & Productivity</option>
+                        <option value="learning">Learning</option>
+                        <option value="personal">Personal Development</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="habit-time">Best Time of Day</label>
+                    <select id="habit-time">
+                        <option value="morning">Morning</option>
+                        <option value="afternoon">Afternoon</option>
+                        <option value="evening">Evening</option>
+                        <option value="anytime">Anytime</option>
+                    </select>
+                </div>
+                <input type="hidden" id="habit-id">
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancel-modal">Cancel</button>
+            <button class="btn-primary" id="save-habit">Save Habit</button>
+        </div>
+    </div>
+    
+    <!-- Edit Goal Modal -->
+    <div class="modal" id="goal-modal">
+        <div class="modal-header">
+            <h3>Edit Main Goal</h3>
+            <button class="btn-close" id="close-goal-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="goal-form">
+                <div class="form-group">
+                    <label for="goal-name">Main Goal Name</label>
+                    <input type="text" id="goal-name" placeholder="e.g., Build Healthy Habits" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancel-goal-modal">Cancel</button>
+            <button class="btn-primary" id="save-goal">Save Goal</button>
+        </div>
+    </div>
+    
+    <!-- Confetti Animation Container -->
+    <div id="confetti-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
